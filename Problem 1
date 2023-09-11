@@ -1,0 +1,36 @@
+from math import *
+
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+protein=pd.read_csv('protein-angle-dataset.csv')
+df=protein.loc[:,['phi','psi']]
+
+
+
+scatter = df.plot(s=2, kind='scatter', x='phi', y='psi')
+plt.xlabel('phi')
+plt.ylabel('psi')
+plt.show()
+hist=plt.hist2d(df['phi'],df['psi'],bins=70)
+plt.show()
+
+fig, image=plt.subplots(2,3)
+i=0
+j=0
+k=1
+inertia=[]
+while k<7:
+    model=KMeans(n_clusters=k).fit(df)
+    pred = model.predict(df)
+    image[i][j].scatter(x=df['phi'], y=df['psi'],c=pred)
+    image[i][j].set_title(f'k={k}')
+    inertia.append(model.inertia_)
+    k = k + 1
+    j=j+1
+    if j%3==0:
+        i=i+1
+        j=0
+plt.show()
+plt.plot(range(1,7),inertia,'-')
+plt.show()
