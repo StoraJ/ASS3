@@ -1,0 +1,33 @@
+import pandas as pd
+from matplotlib import pyplot as plt
+import seaborn as sns
+import numpy as np
+from sklearn.cluster import DBSCAN
+from sklearn.neighbors import NearestNeighbors
+from kneed import KneeLocator
+
+df=pd.read_csv('protein-angle-dataset.csv')
+df.psi = df[["psi"]]
+df.phi = df[['phi']]
+df1=df[['psi','phi']]
+
+nbrs = NearestNeighbors(n_neighbors= 5).fit(df1) #Använder nearest neighbors för att hitta optimal epsilon
+neigh_dist, neigh_ind = nbrs.kneighbors(df1)
+sort_neigh_dist = np.sort(neigh_dist, axis = 0)
+distance = sort_neigh_dist[:, 4]
+#plt.plot(distance)
+#plt.ylabel = "kNN"
+#plt.xlabel = "Observations"
+#plt.show()
+
+kneedle = KneeLocator(x = range(1, len(neigh_dist)+1), y = distance,
+                      S=1.0, curve = "concave", direction = "increasing", online = True)
+#kneedle.plot_knee()
+#plt.show()
+#print(round(kneedle.knee_y, 3))
+
+clustering = DBSCAN(eps = 24.482, min_samples = 4).fit(df1) #min_samples ska vara 2*antal dimensioner.
+labels = clustering.labels_
+set(clustering.labels_)
+scatter = sns.scatterplot(data = df1, x = "psi", y = "phi", hue = labels, palette="deep")
+plt.show()
