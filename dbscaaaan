@@ -1,0 +1,29 @@
+from sklearn.cluster import DBSCAN
+from sklearn.preprocessing import StandardScaler
+import pandas as pd
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('protein-angle-dataset.csv')
+
+x=df[['phi','psi']]
+scaler=StandardScaler()
+df_scaled=scaler.fit_transform(x)
+min_sample=[30,25]
+eps=[0.2,0.3]
+fig, ax=plt.subplots(len(min_sample),len(eps))
+
+for j in range(len(eps)):
+    for i in range(len(min_sample)):
+        dbscan=DBSCAN(eps=eps[j],min_samples=min_sample[i])
+        pred=dbscan.fit_predict(df_scaled)
+        labels=dbscan.labels_
+        n_clusters=len(set(labels))-(1 if -1 in labels else 0)
+        ax[i,j].scatter(df_scaled[:,0],df_scaled[:,1],c=labels,cmap='plasma')
+        ax[i][j].set_title(f'Min sample: {min_sample[i]}, Epsilon: {eps[j]}, clusters: {n_clusters}')
+
+plt.tight_layout()
+plt.show()
+
+
+
+
